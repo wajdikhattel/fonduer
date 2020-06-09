@@ -125,7 +125,7 @@ def extract_textual_features(
                     # Add TreeDLib relation features
                     if candidate.id not in binary_tdl_feats:
                         binary_tdl_feats[candidate.id] = set()
-                        for f in get_tdl_feats(xmltree.root, *s_idxs):
+                        for f in get_tdl_feats(xmltree.root, s_idxs):
                             binary_tdl_feats[candidate.id].add(f)
                     for f in binary_tdl_feats[candidate.id]:
                         yield candidate.id, f"TDL_{f}", DEF_VALUE
