@@ -18,7 +18,7 @@ DEF_VALUE = 1
 
 unary_vizlib_feats: Dict[str, Set] = {}
 binary_vizlib_feats: Dict[str, Set] = {}
-
+multary_strlib_feats: Dict[str, Set] = {}
 
 def extract_visual_features(
     candidates: Union[Candidate, List[Candidate]],
@@ -71,9 +71,26 @@ def extract_visual_features(
                 for f, v in binary_vizlib_feats[candidate.id]:
                     yield candidate.id, FEAT_PRE + f, v
         else:
-            raise NotImplementedError(
-                "Only handles unary and binary candidates currently"
-            )
+            spans = args
+            # Add VisualLib entity features (if applicable)
+            if all([span.sentence.is_visual() for span in spans]):
+                for i, span in enumerate(spans):
+                    prefix = f"e{i}_"
+                    if span.stable_id not in unary_vizlib_feats:
+                        unary_vizlib_feats[span.stable_id] = set()
+                        for f, v in _vizlib_unary_features(span):
+                            unary_vizlib_feats[span.stable_id].add((f, v))
+
+                    for f, v in unary_vizlib_feats[span.stable_id]:
+                        yield candidate.id, FEAT_PRE + prefix + f, v
+
+                if candidate.id not in multary_strlib_feats:
+                    multary_strlib_feats[candidate.id] = set()
+                    for f, v in _vizlib_multary_features(spans):
+                        multary_strlib_feats[candidate.id].add((f, v))
+
+                for f, v in multary_strlib_feats[candidate.id]:
+                    yield candidate.id, FEAT_PRE + f, v
 
 
 def _vizlib_unary_features(span: SpanMention) -> Iterator[Tuple[str, int]]:
@@ -108,4 +125,27 @@ def _vizlib_binary_features(
             yield "VERT_ALIGNED_RIGHT", DEF_VALUE
 
         if is_vert_aligned_center((span1, span2)):
+            yield "VERT_ALIGNED_CENTER", DEF_VALUE
+
+
+def _vizlib_multary_features(
+    spans
+) -> Iterator[Tuple[str, int]]:
+    """Visual-related features for a pair of spans."""
+    if same_page(spans):
+        yield "SAME_PAGE", DEF_VALUE
+
+        if is_horz_aligned(spans):
+            yield "HORZ_ALIGNED", DEF_VALUE
+
+        if is_vert_aligned(spans):
+            yield "VERT_ALIGNED", DEF_VALUE
+
+        if is_vert_aligned_left(spans):
+            yield "VERT_ALIGNED_LEFT", DEF_VALUE
+
+        if is_vert_aligned_right(spans):
+            yield "VERT_ALIGNED_RIGHT", DEF_VALUE
+
+        if is_vert_aligned_center(spans):
             yield "VERT_ALIGNED_CENTER", DEF_VALUE

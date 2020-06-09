@@ -106,9 +106,32 @@ def extract_textual_features(
                 yield candidate.id, f"BASIC_e2_{f}", DEF_VALUE
 
         else:
-            raise NotImplementedError(
-                "Only handles unary and binary candidates currently"
-            )
+            spans = args
+            if all([span.sentence.is_lingual() for span in spans]):
+                get_tdl_feats = compile_relation_feature_generator()
+                sents = [get_as_dict(span.sentence) for span in spans]
+                xmltree = corenlp_to_xmltree(spans[0].sentence)
+                s_idxs = [list(
+                    range(span.get_word_start_index(), span.get_word_end_index() + 1)
+                ) for span in spans]
+                if all([len(s_idx) > 0 for s_idx in s_idxs]):
+                    
+                    # Add DDLIB entity features for relation
+                    for span, sent, s_idx, i in zip(spans, sents, s_idxs, range(len(spans))):
+                        
+                        for f in _get_ddlib_feats(span, sent, s_idx):
+                            yield candidate.id, f"DDL_e{i}_{f}", DEF_VALUE
+
+                    # Add TreeDLib relation features
+                    if candidate.id not in binary_tdl_feats:
+                        binary_tdl_feats[candidate.id] = set()
+                        for f in get_tdl_feats(xmltree.root, *s_idxs):
+                            binary_tdl_feats[candidate.id].add(f)
+                    for f in binary_tdl_feats[candidate.id]:
+                        yield candidate.id, f"TDL_{f}", DEF_VALUE
+            for i, span in enumerate(spans):
+                for f in _get_word_feats(span):
+                    yield candidate.id, f"BASIC_e{i}_{f}", DEF_VALUE
 
 
 def _compile_entity_feature_generator() -> Callable:

@@ -17,6 +17,7 @@ DEF_VALUE = 1
 
 unary_tablelib_feats: Dict[str, Set] = {}
 binary_tablelib_feats: Dict[str, Set] = {}
+multary_strlib_feats: Dict[str, Set] = {}
 
 settings = get_config()
 
@@ -69,9 +70,25 @@ def extract_tabular_features(
                 for f, v in binary_tablelib_feats[candidate.id]:
                     yield candidate.id, FEAT_PRE + f, v
         else:
-            raise NotImplementedError(
-                "Only handles unary and binary candidates currently"
-            )
+            spans = args
+            if all([span.sentence.is_tabular() for span in spans]):
+                for i, span in enumerate(spans):
+                    prefix = f"e{i}_"
+                    if span.stable_id not in unary_tablelib_feats:
+                        unary_tablelib_feats[span.stable_id] = set()
+                        for f, v in _tablelib_unary_features(span):
+                            unary_tablelib_feats[span.stable_id].add((f, v))
+
+                    for f, v in unary_tablelib_feats[span.stable_id]:
+                        yield candidate.id, FEAT_PRE + prefix + f, v
+
+                if candidate.id not in multary_strlib_feats:
+                    multary_strlib_feats[candidate.id] = set()
+                    for f, v in _tablelib_multary_features(spans):
+                        multary_strlib_feats[candidate.id].add((f, v))
+
+                for f, v in multary_strlib_feats[candidate.id]:
+                    yield candidate.id, FEAT_PRE + f, v
 
 
 def _tablelib_unary_features(span: SpanMention) -> Iterator[Tuple[str, int]]:
@@ -180,6 +197,63 @@ def _tablelib_binary_features(
                 col_diff = min_col_diff(
                     span1.sentence,
                     span2.sentence,
+                    absolute=binary_features["min_col_diff"]["absolute"],
+                )
+                yield f"DIFF_TABLE_ROW_DIFF_[{row_diff}]", DEF_VALUE
+                yield f"DIFF_TABLE_COL_DIFF_[{col_diff}]", DEF_VALUE
+                yield (
+                    f"DIFF_TABLE_MANHATTAN_DIST_[{abs(row_diff) + abs(col_diff)}]"
+                ), DEF_VALUE
+
+
+def _tablelib_multary_features(
+    spans: List[SpanMention]
+) -> Iterator[Tuple[str, int]]:
+    """Table-/structure-related features for a pair of spans."""
+    binary_features = settings["featurization"]["tabular"]["binary_features"]
+    if all([span.sentence.is_tabular() for span in spans]):
+        span_tables = [span.sentence.table for span in spans]
+        if [span_tables[1:] == span_tables[:-1]]:
+            yield "SAME_TABLE", DEF_VALUE
+            if all([span.sentence.cell is not None for span in spans]):
+                row_diff = min_row_diff(
+                    [span.sentence for span in spans],
+                    absolute=binary_features["min_row_diff"]["absolute"],
+                )
+                col_diff = min_col_diff(
+                    [span.sentence for span in spans],
+                    absolute=binary_features["min_col_diff"]["absolute"],
+                )
+                yield f"SAME_TABLE_ROW_DIFF_[{row_diff}]", DEF_VALUE
+                yield f"SAME_TABLE_COL_DIFF_[{col_diff}]", DEF_VALUE
+                yield (
+                    f"SAME_TABLE_MANHATTAN_DIST_[{abs(row_diff) + abs(col_diff)}]"
+                ), DEF_VALUE
+                span_cells = [span.sentence.cell for span in spans]
+                if [span_cells[1:] == span_cells[:-1]]:
+                    yield "SAME_CELL", DEF_VALUE
+                    word_diff = spans[0].get_word_start_index() - min(
+                        span.get_word_start_index() for span in spans)
+                    yield (
+                        f"WORD_DIFF_[{word_diff}]"
+                    ), DEF_VALUE
+                    char_diff = spans[0].char_start - min(
+                        span.char_start for span in spans)
+                    yield (
+                        f"CHAR_DIFF_[{char_diff}]"
+                    ), DEF_VALUE
+                    span_sentences = [span.sentence for span in spans]
+                    if [span_sentences[1:] == span_sentences[:-1]]:
+                        yield "SAME_SENTENCE", DEF_VALUE
+        else:
+            if all([span.sentence.cell is not None for span in spans]):
+                yield "DIFF_TABLE", DEF_VALUE
+                row_diff = min_row_diff(
+                    [span.sentence for span in spans],
+                    absolute=binary_features["min_row_diff"]["absolute"],
+                )
+                col_diff = min_col_diff(
+                    [span.sentence for span in spans],
                     absolute=binary_features["min_col_diff"]["absolute"],
                 )
                 yield f"DIFF_TABLE_ROW_DIFF_[{row_diff}]", DEF_VALUE
