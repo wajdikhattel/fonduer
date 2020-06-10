@@ -20,6 +20,7 @@ unary_vizlib_feats: Dict[str, Set] = {}
 binary_vizlib_feats: Dict[str, Set] = {}
 multary_strlib_feats: Dict[str, Set] = {}
 
+
 def extract_visual_features(
     candidates: Union[Candidate, List[Candidate]],
 ) -> Iterator[Tuple[int, str, int]]:
@@ -128,9 +129,7 @@ def _vizlib_binary_features(
             yield "VERT_ALIGNED_CENTER", DEF_VALUE
 
 
-def _vizlib_multary_features(
-    spans
-) -> Iterator[Tuple[str, int]]:
+def _vizlib_multary_features(spans) -> Iterator[Tuple[str, int]]:
     """Visual-related features for a pair of spans."""
     if same_page(spans):
         yield "SAME_PAGE", DEF_VALUE

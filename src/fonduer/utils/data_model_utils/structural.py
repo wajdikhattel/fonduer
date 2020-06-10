@@ -198,8 +198,9 @@ def common_ancestor(c: Tuple[SpanMention, ...]) -> List[str]:
     min_len = min([a.size for a in ancestors])
     arrays = np.array([a[:min_len] for a in ancestors])
     x = np.argmin(arrays[:-1] == arrays[1:], axis=1)
-    val = np.min(x[np.nonzero(x)]) 
+    val = np.min(x[np.nonzero(x)])
     return list(ancestors[0][:val])
+
 
 # def lowest_common_ancestor_depth(c: Tuple[SpanMention, SpanMention]) -> int:
 #     """Return the minimum distance between a binary-Mention Candidate to their
@@ -254,5 +255,5 @@ def lowest_common_ancestor_depth(c: Tuple[SpanMention, ...]) -> int:
     min_len = min([a.size for a in ancestors])
     arrays = np.array([a[:min_len] for a in ancestors])
     x = np.argmin(arrays[:-1] == arrays[1:], axis=1)
-    val = np.min(x[np.nonzero(x)]) 
+    val = np.min(x[np.nonzero(x)])
     return min_len - val

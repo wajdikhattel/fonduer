@@ -206,9 +206,7 @@ def _tablelib_binary_features(
                 ), DEF_VALUE
 
 
-def _tablelib_multary_features(
-    spans: List[SpanMention]
-) -> Iterator[Tuple[str, int]]:
+def _tablelib_multary_features(spans: List[SpanMention]) -> Iterator[Tuple[str, int]]:
     """Table-/structure-related features for a pair of spans."""
     binary_features = settings["featurization"]["tabular"]["binary_features"]
     if all([span.sentence.is_tabular() for span in spans]):
@@ -233,15 +231,13 @@ def _tablelib_multary_features(
                 if [span_cells[1:] == span_cells[:-1]]:
                     yield "SAME_CELL", DEF_VALUE
                     word_diff = spans[0].get_word_start_index() - min(
-                        span.get_word_start_index() for span in spans)
-                    yield (
-                        f"WORD_DIFF_[{word_diff}]"
-                    ), DEF_VALUE
+                        span.get_word_start_index() for span in spans
+                    )
+                    yield (f"WORD_DIFF_[{word_diff}]"), DEF_VALUE
                     char_diff = spans[0].char_start - min(
-                        span.char_start for span in spans)
-                    yield (
-                        f"CHAR_DIFF_[{char_diff}]"
-                    ), DEF_VALUE
+                        span.char_start for span in spans
+                    )
+                    yield (f"CHAR_DIFF_[{char_diff}]"), DEF_VALUE
                     span_sentences = [span.sentence for span in spans]
                     if [span_sentences[1:] == span_sentences[:-1]]:
                         yield "SAME_SENTENCE", DEF_VALUE

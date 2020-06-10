@@ -40,9 +40,7 @@ def _min_range_diff(
     )
 
 
-def min_row_diff(
-    cells, absolute: bool = True
-) -> int:
+def min_row_diff(cells, absolute: bool = True) -> int:
     coordinates = [(cell.row_start, cell.row_end) for cell in cells]
     f = lambda x: (abs(x) if absolute else x)
     return min(
@@ -55,9 +53,7 @@ def min_row_diff(
     )
 
 
-def min_col_diff(
-    cells, absolute: bool = True
-) -> int:
+def min_col_diff(cells, absolute: bool = True) -> int:
     coordinates = [(cell.col_start, cell.col_end) for cell in cells]
     f = lambda x: (abs(x) if absolute else x)
     return min(

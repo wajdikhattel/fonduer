@@ -111,14 +111,21 @@ def extract_textual_features(
                 get_tdl_feats = compile_relation_feature_generator()
                 sents = [get_as_dict(span.sentence) for span in spans]
                 xmltree = corenlp_to_xmltree(spans[0].sentence)
-                s_idxs = [list(
-                    range(span.get_word_start_index(), span.get_word_end_index() + 1)
-                ) for span in spans]
+                s_idxs = [
+                    list(
+                        range(
+                            span.get_word_start_index(), span.get_word_end_index() + 1
+                        )
+                    )
+                    for span in spans
+                ]
                 if all([len(s_idx) > 0 for s_idx in s_idxs]):
-                    
+
                     # Add DDLIB entity features for relation
-                    for span, sent, s_idx, i in zip(spans, sents, s_idxs, range(len(spans))):
-                        
+                    for span, sent, s_idx, i in zip(
+                        spans, sents, s_idxs, range(len(spans))
+                    ):
+
                         for f in _get_ddlib_feats(span, sent, s_idx):
                             yield candidate.id, f"DDL_e{i}_{f}", DEF_VALUE
 

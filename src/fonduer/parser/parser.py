@@ -467,7 +467,7 @@ class ParserUDF(UDF):
         elif node.tag == "figure":
             # Pull the image from a child img node, if one exists
             imgs = [child for child in node if child.tag == "img"]
-            
+
             if len(imgs) == 0:
                 return state
 
