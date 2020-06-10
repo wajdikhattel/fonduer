@@ -9,11 +9,7 @@ from fonduer.parser.models.table import Cell
 
 
 @lru_cache(maxsize=1024)
-def _min_range_diff(
-    coordinates, absolute: bool = True
-) -> int:
-    """Get the minimum range difference.
-
+def _min_range_diff(coordinates: List[Tuple[int, int]], absolute: bool = True) -> int:
     # coordinates is a list of a couple (start, end)
     # if absolute=True, return the absolute value of minimum magnitude difference
     # if absolute=False, return the raw value of minimum magnitude difference
@@ -40,7 +36,7 @@ def _min_range_diff(
     )
 
 
-def min_row_diff(cells, absolute: bool = True) -> int:
+def min_row_diff(cells: List[Union[Cell, Sentence]], absolute: bool = True) -> int:
     coordinates = [(cell.row_start, cell.row_end) for cell in cells]
     f = lambda x: (abs(x) if absolute else x)
     return min(
@@ -53,7 +49,7 @@ def min_row_diff(cells, absolute: bool = True) -> int:
     )
 
 
-def min_col_diff(cells, absolute: bool = True) -> int:
+def min_col_diff(cells: List[Union[Cell, Sentence]], absolute: bool = True) -> int:
     coordinates = [(cell.col_start, cell.col_end) for cell in cells]
     f = lambda x: (abs(x) if absolute else x)
     return min(

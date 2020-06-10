@@ -137,7 +137,7 @@ def _strlib_binary_features(
     ), DEF_VALUE
 
 
-def _strlib_multary_features(spans) -> Iterator[Tuple[str, int]]:
+def _strlib_multary_features(spans: List[SpanMention]) -> Iterator[Tuple[str, int]]:
     """Structural-related features for a pair of spans."""
     yield f"COMMON_ANCESTOR_[{' '.join(common_ancestor(spans))}]", DEF_VALUE
 
