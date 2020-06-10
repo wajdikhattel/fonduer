@@ -2,7 +2,7 @@
 import itertools
 from builtins import range
 from functools import lru_cache
-from typing import List, Optional, Union, Tuple
+from typing import List, Optional, Tuple, Union
 
 from fonduer.parser.models.sentence import Sentence
 from fonduer.parser.models.table import Cell
