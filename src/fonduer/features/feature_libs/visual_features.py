@@ -129,7 +129,9 @@ def _vizlib_binary_features(
             yield "VERT_ALIGNED_CENTER", DEF_VALUE
 
 
-def _vizlib_multary_features(spans: List[SpanMention]) -> Iterator[Tuple[str, int]]:
+def _vizlib_multary_features(
+    spans: Tuple[SpanMention, ...]
+) -> Iterator[Tuple[str, int]]:
     """Visual-related features for a pair of spans."""
     if same_page(spans):
         yield "SAME_PAGE", DEF_VALUE
