@@ -39,27 +39,13 @@ def _min_range_diff(coordinates: List[Tuple[int, int]], absolute: bool = True) -
 def min_row_diff(cells: List[Union[Cell, Sentence]], absolute: bool = True) -> int:
     coordinates = [(cell.row_start, cell.row_end) for cell in cells]
     f = lambda x: (abs(x) if absolute else x)
-    return min(
-        [
-            f(ii[0] - sum(ii[1:]))
-            for ii in itertools.product(
-                *[range(start, end + 1) for start, end in coordinates]
-            )
-        ]
-    )
+    return _min_range_diff(coordinates, absolute=absolute)
 
 
 def min_col_diff(cells: List[Union[Cell, Sentence]], absolute: bool = True) -> int:
     coordinates = [(cell.col_start, cell.col_end) for cell in cells]
     f = lambda x: (abs(x) if absolute else x)
-    return min(
-        [
-            f(ii[0] - sum(ii[1:]))
-            for ii in itertools.product(
-                *[range(start, end + 1) for start, end in coordinates]
-            )
-        ]
-    )
+    return _min_range_diff(coordinates, absolute=absolute)
 
 
 def min_axis_diff(
