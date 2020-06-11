@@ -27,7 +27,7 @@ DEF_VALUE = 1
 unary_ddlib_feats: Dict[str, Set] = {}
 unary_word_feats: Dict[str, Set] = {}
 unary_tdl_feats: Dict[str, Set] = {}
-binary_tdl_feats: Dict[str, Set] = {}
+multary_tdl_feats: Dict[str, Set] = {}
 settings = get_config()
 
 
@@ -69,42 +69,7 @@ def extract_textual_features(
             for f in _get_word_feats(span):
                 yield candidate.id, f"BASIC_{f}", DEF_VALUE
 
-        # Binary candidates
-        elif len(args) == 2:
-            span1, span2 = args
-            if span1.sentence.is_lingual() and span2.sentence.is_lingual():
-                get_tdl_feats = compile_relation_feature_generator()
-                sent1 = get_as_dict(span1.sentence)
-                sent2 = get_as_dict(span2.sentence)
-                xmltree = corenlp_to_xmltree(span1.sentence)
-                s1_idxs = list(
-                    range(span1.get_word_start_index(), span1.get_word_end_index() + 1)
-                )
-                s2_idxs = list(
-                    range(span2.get_word_start_index(), span2.get_word_end_index() + 1)
-                )
-                if len(s1_idxs) > 0 and len(s2_idxs) > 0:
-
-                    # Add DDLIB entity features for relation
-                    for f in _get_ddlib_feats(span1, sent1, s1_idxs):
-                        yield candidate.id, f"DDL_e1_{f}", DEF_VALUE
-
-                    for f in _get_ddlib_feats(span2, sent2, s2_idxs):
-                        yield candidate.id, f"DDL_e2_{f}", DEF_VALUE
-
-                    # Add TreeDLib relation features
-                    if candidate.id not in binary_tdl_feats:
-                        binary_tdl_feats[candidate.id] = set()
-                        for f in get_tdl_feats(xmltree.root, s1_idxs, s2_idxs):
-                            binary_tdl_feats[candidate.id].add(f)
-                    for f in binary_tdl_feats[candidate.id]:
-                        yield candidate.id, f"TDL_{f}", DEF_VALUE
-            for f in _get_word_feats(span1):
-                yield candidate.id, f"BASIC_e1_{f}", DEF_VALUE
-
-            for f in _get_word_feats(span2):
-                yield candidate.id, f"BASIC_e2_{f}", DEF_VALUE
-
+        # Multary candidates
         else:
             spans = args
             if all([span.sentence.is_lingual() for span in spans]):
@@ -130,11 +95,11 @@ def extract_textual_features(
                             yield candidate.id, f"DDL_e{i}_{f}", DEF_VALUE
 
                     # Add TreeDLib relation features
-                    if candidate.id not in binary_tdl_feats:
-                        binary_tdl_feats[candidate.id] = set()
+                    if candidate.id not in multary_tdl_feats:
+                        multary_tdl_feats[candidate.id] = set()
                         for f in get_tdl_feats(xmltree.root, s_idxs):
-                            binary_tdl_feats[candidate.id].add(f)
-                    for f in binary_tdl_feats[candidate.id]:
+                            multary_tdl_feats[candidate.id].add(f)
+                    for f in multary_tdl_feats[candidate.id]:
                         yield candidate.id, f"TDL_{f}", DEF_VALUE
             for i, span in enumerate(spans):
                 for f in _get_word_feats(span):
