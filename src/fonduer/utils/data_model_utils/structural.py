@@ -169,22 +169,6 @@ def get_ancestor_id_names(
     return id_names
 
 
-# def common_ancestor(c: Tuple[SpanMention, SpanMention]) -> List[str]:
-#     """Return the path to the root that is shared between a binary-Mention Candidate.
-
-#     In particular, this is the common path of HTML tags.
-
-#     :param c: The binary-Mention Candidate to evaluate
-#     :rtype: list of strings
-#     """
-#     span1 = _to_span(c[0])
-#     span2 = _to_span(c[1])
-#     ancestor1 = np.array(span1.sentence.xpath.split("/"))
-#     ancestor2 = np.array(span2.sentence.xpath.split("/"))
-#     min_len = min(ancestor1.size, ancestor2.size)
-#     return list(ancestor1[: np.argmin(ancestor1[:min_len] == ancestor2[:min_len])])
-
-
 def common_ancestor(c: Tuple[SpanMention, ...]) -> List[str]:
     """Return the path to the root that is shared between a multary-Mention Candidate.
 
@@ -200,34 +184,6 @@ def common_ancestor(c: Tuple[SpanMention, ...]) -> List[str]:
     x = np.argmin(arrays[:-1] == arrays[1:], axis=1)
     val = np.min(x[np.nonzero(x)])
     return list(ancestors[0][:val])
-
-
-# def lowest_common_ancestor_depth(c: Tuple[SpanMention, SpanMention]) -> int:
-#     """Return the minimum distance between a binary-Mention Candidate to their
-#     lowest common ancestor.
-
-#     For example, if the tree looked like this::
-
-#         html
-#         ├──<div> Mention 1 </div>
-#         ├──table
-#         │    ├──tr
-#         │    │  └──<th> Mention 2 </th>
-
-#     we return 1, the distance from Mention 1 to the html root. Smaller values
-#     indicate that two Mentions are close structurally, while larger values
-#     indicate that two Mentions are spread far apart structurally in the
-#     document.
-
-#     :param c: The binary-Mention Candidate to evaluate
-#     :rtype: integer
-#     """
-#     span1 = _to_span(c[0])
-#     span2 = _to_span(c[1])
-#     ancestor1 = np.array(span1.sentence.xpath.split("/"))
-#     ancestor2 = np.array(span2.sentence.xpath.split("/"))
-#     min_len = min(ancestor1.size, ancestor2.size)
-#     return min_len - np.argmin(ancestor1[:min_len] == ancestor2[:min_len])
 
 
 def lowest_common_ancestor_depth(c: Tuple[SpanMention, ...]) -> int:

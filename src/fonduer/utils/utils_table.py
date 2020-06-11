@@ -28,7 +28,7 @@ def _min_range_diff(coordinates: Tuple[Tuple[int, int]], absolute: bool = True) 
     f = lambda x: (abs(x) if absolute else x)
     return min(
         [
-            f(ii[0] - sum(ii[1:]))
+            f(min([iii[0] - iii[1] for iii in itertools.combinations(ii, 2)], key=abs))
             for ii in itertools.product(
                 *[range(start, end + 1) for start, end in coordinates]
             )
