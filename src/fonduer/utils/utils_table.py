@@ -15,7 +15,7 @@ def _min_range_diff(coordinates: Tuple[Tuple[int, int]], absolute: bool = True) 
     # if absolute=True, return the absolute value of minimum magnitude difference
     # if absolute=False, return the raw value of minimum magnitude difference
     # TODO: move back to efficient implementation once it sees that
-    # min_range_diff(3,3,2,3) = 0 return max(0, max(a_end - b_start, b_end -
+    # min_range_diff(((3,3),(2,3))) = 0 return max(0, max(a_end - b_start, b_end -
     # a_start))
 
     :param a_start: The start index of the first object.
@@ -28,9 +28,9 @@ def _min_range_diff(coordinates: Tuple[Tuple[int, int]], absolute: bool = True) 
     f = lambda x: (abs(x) if absolute else x)
     return min(
         [
-            f(min([iii[0] - iii[1] for iii in itertools.combinations(ii, 2)], key=abs))
+            f(max([x - y for x, y in zip(sorted(ii)[:-1], sorted(ii)[1:])], key=abs))
             for ii in itertools.product(
-                *[range(start, end + 1) for start, end in coordinates]
+                *[range(start, end + 1) for start, end in (((3, 4), (1, 2), (4, 5)))]
             )
         ],
         key=abs,
