@@ -30,7 +30,7 @@ def _min_range_diff(coordinates: Tuple[Tuple[int, int]], absolute: bool = True) 
         [
             f(max([x - y for x, y in zip(sorted(ii)[:-1], sorted(ii)[1:])], key=abs))
             for ii in itertools.product(
-                *[range(start, end + 1) for start, end in (((3, 4), (1, 2), (4, 5)))]
+                *[range(start, end + 1) for start, end in coordinates]
             )
         ],
         key=abs,
