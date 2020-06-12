@@ -48,26 +48,7 @@ def extract_tabular_features(
 
             for f, v in unary_tablelib_feats[span.stable_id]:
                 yield candidate.id, FEAT_PRE + f, v
-        # Binary candidates
-        elif len(args) == 2:
-            span1, span2 = args
-            if span1.sentence.is_tabular() or span2.sentence.is_tabular():
-                for span, pre in [(span1, "e1_"), (span2, "e2_")]:
-                    if span.stable_id not in unary_tablelib_feats:
-                        unary_tablelib_feats[span.stable_id] = set()
-                        for f, v in _tablelib_unary_features(span):
-                            unary_tablelib_feats[span.stable_id].add((f, v))
 
-                    for f, v in unary_tablelib_feats[span.stable_id]:
-                        yield candidate.id, FEAT_PRE + pre + f, v
-
-                if candidate.id not in binary_tablelib_feats:
-                    binary_tablelib_feats[candidate.id] = set()
-                    for f, v in _tablelib_binary_features(span1, span2):
-                        binary_tablelib_feats[candidate.id].add((f, v))
-
-                for f, v in binary_tablelib_feats[candidate.id]:
-                    yield candidate.id, FEAT_PRE + f, v
         # Multary candidates
         else:
             spans = args
@@ -148,58 +129,6 @@ def _tablelib_unary_features(span: SpanMention) -> Iterator[Tuple[str, int]]:
         #      span, n_max=2, attrib=attrib, direct=False, infer=True
         #  ):
         #      yield "COL_INFERRED_%s_[%s]" % (attrib.upper(), ngram), DEF_VALUE
-
-
-def _tablelib_binary_features(
-    span1: SpanMention, span2: SpanMention
-) -> Iterator[Tuple[str, int]]:
-    """Table-/structure-related features for a pair of spans."""
-    binary_features = settings["featurization"]["tabular"]["binary_features"]
-    if span1.sentence.is_tabular() and span2.sentence.is_tabular():
-        if span1.sentence.table == span2.sentence.table:
-            yield "SAME_TABLE", DEF_VALUE
-            if span1.sentence.cell is not None and span2.sentence.cell is not None:
-                row_diff = min_row_diff(
-                    [span1.sentence, span2.sentence],
-                    absolute=binary_features["min_row_diff"]["absolute"],
-                )
-                col_diff = min_col_diff(
-                    [span1.sentence, span2.sentence],
-                    absolute=binary_features["min_col_diff"]["absolute"],
-                )
-                yield f"SAME_TABLE_ROW_DIFF_[{row_diff}]", DEF_VALUE
-                yield f"SAME_TABLE_COL_DIFF_[{col_diff}]", DEF_VALUE
-                yield (
-                    f"SAME_TABLE_MANHATTAN_DIST_[{abs(row_diff) + abs(col_diff)}]"
-                ), DEF_VALUE
-                if span1.sentence.cell == span2.sentence.cell:
-                    yield "SAME_CELL", DEF_VALUE
-                    yield (
-                        f"WORD_DIFF_["
-                        f"{span1.get_word_start_index() - span2.get_word_start_index()}"
-                        f"]"
-                    ), DEF_VALUE
-                    yield (
-                        f"CHAR_DIFF_[{span1.char_start - span2.char_start}]"
-                    ), DEF_VALUE
-                    if span1.sentence == span2.sentence:
-                        yield "SAME_SENTENCE", DEF_VALUE
-        else:
-            if span1.sentence.cell is not None and span2.sentence.cell is not None:
-                yield "DIFF_TABLE", DEF_VALUE
-                row_diff = min_row_diff(
-                    [span1.sentence, span2.sentence],
-                    absolute=binary_features["min_row_diff"]["absolute"],
-                )
-                col_diff = min_col_diff(
-                    [span1.sentence, span2.sentence],
-                    absolute=binary_features["min_col_diff"]["absolute"],
-                )
-                yield f"DIFF_TABLE_ROW_DIFF_[{row_diff}]", DEF_VALUE
-                yield f"DIFF_TABLE_COL_DIFF_[{col_diff}]", DEF_VALUE
-                yield (
-                    f"DIFF_TABLE_MANHATTAN_DIST_[{abs(row_diff) + abs(col_diff)}]"
-                ), DEF_VALUE
 
 
 def _tablelib_multary_features(
