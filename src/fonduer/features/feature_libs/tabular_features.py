@@ -160,13 +160,13 @@ def _tablelib_binary_features(
             yield "SAME_TABLE", DEF_VALUE
             if span1.sentence.cell is not None and span2.sentence.cell is not None:
                 row_diff = min_row_diff(
-                    span1.sentence,
-                    span2.sentence,
+                    [span1.sentence,
+                    span2.sentence],
                     absolute=binary_features["min_row_diff"]["absolute"],
                 )
                 col_diff = min_col_diff(
-                    span1.sentence,
-                    span2.sentence,
+                    [span1.sentence,
+                    span2.sentence],
                     absolute=binary_features["min_col_diff"]["absolute"],
                 )
                 yield f"SAME_TABLE_ROW_DIFF_[{row_diff}]", DEF_VALUE
@@ -190,13 +190,13 @@ def _tablelib_binary_features(
             if span1.sentence.cell is not None and span2.sentence.cell is not None:
                 yield "DIFF_TABLE", DEF_VALUE
                 row_diff = min_row_diff(
-                    span1.sentence,
-                    span2.sentence,
+                    [span1.sentence,
+                    span2.sentence],
                     absolute=binary_features["min_row_diff"]["absolute"],
                 )
                 col_diff = min_col_diff(
-                    span1.sentence,
-                    span2.sentence,
+                    [span1.sentence,
+                    span2.sentence],
                     absolute=binary_features["min_col_diff"]["absolute"],
                 )
                 yield f"DIFF_TABLE_ROW_DIFF_[{row_diff}]", DEF_VALUE
