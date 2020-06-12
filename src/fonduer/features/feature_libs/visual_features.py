@@ -88,7 +88,7 @@ def _vizlib_unary_features(span: SpanMention) -> Iterator[Tuple[str, int]]:
 def _vizlib_multary_features(
     spans: Tuple[SpanMention, ...]
 ) -> Iterator[Tuple[str, int]]:
-    """Visual-related features for a pair of spans."""
+    """Visual-related features for multiple spans."""
     if same_page(spans):
         yield "SAME_PAGE", DEF_VALUE
 

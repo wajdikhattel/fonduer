@@ -73,7 +73,7 @@ def extract_textual_features(
         else:
             spans = args
             if all([span.sentence.is_lingual() for span in spans]):
-                get_tdl_feats = compile_relation_feature_generator()
+                get_tdl_feats = compile_relation_feature_generator(is_multary=True)
                 sents = [get_as_dict(span.sentence) for span in spans]
                 xmltree = corenlp_to_xmltree(spans[0].sentence)
                 s_idxs = [
