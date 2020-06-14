@@ -11,7 +11,7 @@ from fonduer.parser.models.table import Cell
 @lru_cache(maxsize=1024)
 def _min_range_diff(coordinates: Tuple[Tuple[int, int]], absolute: bool = True) -> int:
     """Get the minimum range difference.
-    # For coordinates, using Tuple instead of list because list is unhashable with `lru_cache`
+    # Using Tuple instead of list because list is unhashable with `lru_cache`
     # if absolute=True, return the absolute value of minimum magnitude difference
     # if absolute=False, return the raw value of minimum magnitude difference
     # TODO: move back to efficient implementation once it sees that
