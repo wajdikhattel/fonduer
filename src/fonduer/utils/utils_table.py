@@ -10,18 +10,14 @@ from fonduer.parser.models.table import Cell
 
 @lru_cache(maxsize=1024)
 def _min_range_diff(coordinates: Tuple[Tuple[int, int]], absolute: bool = True) -> int:
-    # coordinates is a tuple of a couple (start, end)
-    # Using Tuple instead of list because list is unhashable with `lru_cache`
+    """Get the minimum range difference.
+    # For coordinates, using Tuple instead of list because list is unhashable with `lru_cache`
     # if absolute=True, return the absolute value of minimum magnitude difference
     # if absolute=False, return the raw value of minimum magnitude difference
     # TODO: move back to efficient implementation once it sees that
-    # min_range_diff(((3,3),(2,3))) = 0 return max(0, max(a_end - b_start, b_end -
+    # min_range_diff(3,3,2,3) = 0 return max(0, max(a_end - b_start, b_end -
     # a_start))
-
-    :param a_start: The start index of the first object.
-    :param a_end: The end index of the first object.
-    :param b_start: The start index of the second object.
-    :param b_end: The end index of the second object.
+    :param coordinates: A tuple of a couple (start, end) indexes of the objects.
     :param absolute: Whether use absolute value, defaults to True.
     :return: The minimum range difference.
     """
