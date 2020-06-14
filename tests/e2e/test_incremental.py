@@ -118,7 +118,7 @@ def test_incremental():
     featurizer.apply(split=0, train=True, parallelism=PARALLEL)
     assert session.query(Feature).count() == len(train_cands[0])
     num_feature_keys = session.query(FeatureKey).count()
-    assert num_feature_keys == 526
+    assert num_feature_keys == 525
 
     F_train = featurizer.get_feature_matrices(train_cands)
     assert F_train[0].shape == (len(train_cands[0]), num_feature_keys)
@@ -190,7 +190,7 @@ def test_incremental():
     featurizer.update(new_docs, parallelism=PARALLEL)
     assert session.query(Feature).count() == len(train_cands[0])
     num_feature_keys = session.query(FeatureKey).count()
-    assert num_feature_keys == 2526
+    assert num_feature_keys == 2537
     F_train = featurizer.get_feature_matrices(train_cands)
     assert F_train[0].shape == (len(train_cands[0]), num_feature_keys)
     assert len(featurizer.get_keys()) == num_feature_keys
