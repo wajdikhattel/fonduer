@@ -12,6 +12,9 @@ Added
 * `@HiromuHota`_: Support spaCy v2.2.
   (`#384 <https://github.com/HazyResearch/fonduer/issues/384>`_)
   (`#432 <https://github.com/HazyResearch/fonduer/pull/432>`_)
+* `@wajdikhattel`_: Add multinary candidates.
+  (`#455 <https://github.com/HazyResearch/fonduer/issues/455>`_)
+  (`#456 <https://github.com/HazyResearch/fonduer/pull/456>`_)
 
 Changed
 ^^^^^^^
