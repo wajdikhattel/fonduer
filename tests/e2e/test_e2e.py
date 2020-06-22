@@ -186,6 +186,9 @@ def test_e2e():
 
     # Test that FeatureKey is properly reset
     featurizer.apply(split=1, train=True, parallelism=PARALLEL)
+    import json
+    x = [a.name for a in session.query(FeatureKey).all()]
+    json.dump(x, open('test.json', 'w'))
     assert session.query(Feature).count() == 214
     num_feature_keys = session.query(FeatureKey).count()
     assert num_feature_keys == 1029
