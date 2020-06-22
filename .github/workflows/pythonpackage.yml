@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.6, 3.7]
+        python-version: [3.6]
     services:
       postgres:
         image: postgres:12
@@ -47,10 +47,10 @@ jobs:
       run: |
         make dev_extra
         pip install -q pytest-cov
-    - name: Run preliminary checks
-      run: |
-        make check
-        make docs
+    # - name: Run preliminary checks
+    #   run: |
+    #     make check
+    #     make docs
     - name: Set up test databases and test data
       run: |
         createdb e2e_test -p 5432 -h 127.0.0.1 -w -U postgres
@@ -62,8 +62,12 @@ jobs:
       env:
         PGPASSWORD: postgres
     - name: Test with pytest
+      uses: actions/upload-artifact@v1
+        with:
+          name: test
+          path: test.json
       run: |
-        pytest --cov=./ --cov-report=xml
+        pytest tests/e2e/ --cov=./ --cov-report=xml
       env:
         PGPASSWORD: postgres
         PGUSER: postgres
@@ -77,90 +81,90 @@ jobs:
         flags: unittests
         name: codecov-umbrella
         fail_ci_if_error: true
-  macos-test:
-    runs-on: macos-latest
-    strategy:
-      matrix:
-        python-version: [3.6.10, 3.7.7]
-    steps:
-    - uses: actions/checkout@v2
-    # actions/setup-python@v1 cannot be used on macos (see #386)
-    - name: Install python version ${{ matrix.python-version }}
-      uses: gabrielfalcao/pyenv-action@v5
-      with:
-        default: "${{ matrix.python-version }}"
-        command: |
-          pip install -U pip  # upgrade pip after installing python
-          echo "::add-path::`pyenv root`/shims"
-    - name: Install dependencies for macOS
-      run: |
-        brew update
-        # Install ImageMagick for Wand.
-        brew install freetype imagemagick ghostscript
+  # macos-test:
+  #   runs-on: macos-latest
+  #   strategy:
+  #     matrix:
+  #       python-version: [3.6.10, 3.7.7]
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   # actions/setup-python@v1 cannot be used on macos (see #386)
+  #   - name: Install python version ${{ matrix.python-version }}
+  #     uses: gabrielfalcao/pyenv-action@v5
+  #     with:
+  #       default: "${{ matrix.python-version }}"
+  #       command: |
+  #         pip install -U pip  # upgrade pip after installing python
+  #         echo "::add-path::`pyenv root`/shims"
+  #   - name: Install dependencies for macOS
+  #     run: |
+  #       brew update
+  #       # Install ImageMagick for Wand.
+  #       brew install freetype imagemagick ghostscript
 
-        brew install poppler
+  #       brew install poppler
 
-        brew install neofetch
-        # - name: Install postgres for macOS
-        #   run: |
-        # Install PostgreSQL 10 (12 not compatible with Fonduer)
-        # See https://github.com/HazyResearch/fonduer/issues/371
-        brew install postgresql@10
-        export PATH="/usr/local/opt/postgresql@10/bin:$PATH"
-        echo "::add-path::/usr/local/opt/postgresql@10/bin"
+  #       brew install neofetch
+  #       # - name: Install postgres for macOS
+  #       #   run: |
+  #       # Install PostgreSQL 10 (12 not compatible with Fonduer)
+  #       # See https://github.com/HazyResearch/fonduer/issues/371
+  #       brew install postgresql@10
+  #       export PATH="/usr/local/opt/postgresql@10/bin:$PATH"
+  #       echo "::add-path::/usr/local/opt/postgresql@10/bin"
 
-        # https://github.com/brianmario/mysql2/issues/795
-        echo "::set-env name=LIBRARY_PATH::$LIBRARY_PATH:/usr/local/opt/openssl@1.1/lib/"
+  #       # https://github.com/brianmario/mysql2/issues/795
+  #       echo "::set-env name=LIBRARY_PATH::$LIBRARY_PATH:/usr/local/opt/openssl@1.1/lib/"
 
-        # Start postgresql for osx
-        rm -rf /usr/local/var/postgresql@10
-        initdb /usr/local/var/postgresql@10
-        pg_ctl -D /usr/local/var/postgresql@10 start; sleep 5
-        createuser -s postgres
-    - name: Set up test databases and test data
-      run: |
-        createdb e2e_test -p 5432 -h 127.0.0.1 -w -U postgres
-        createdb inc_test -p 5432 -h 127.0.0.1 -w -U postgres
-        createdb meta_test -p 5432 -h 127.0.0.1 -w -U postgres
-        createdb pg_test -p 5432 -h 127.0.0.1 -w -U postgres
-        cd tests && ./download_data.sh && cd ..
-    - name: Print Version Info
-      run: |
-        pdfinfo -v
-        psql --version
-        python --version
-        pip --version
-        neofetch
-    - name: Install Fonduer
-      run: |
-        make dev_extra
-        pip install -q pytest-cov
-    - name: Run preliminary checks
-      run: |
-        make check
-        make docs
-      env:
-        PGPASSWORD: postgres
-    - name: Test with pytest
-      run: |
-        python -m spacy download en
-        pytest --cov=./ --cov-report=xml
-      env:
-        PGPASSWORD: postgres
-        PGUSER: postgres
-        POSTGRES_PORT: 5432
-        # Use 127.0.0.1 instead of localhost (#351)
-        POSTGRES_HOST: 127.0.0.1
-        # https://stackoverflow.com/questions/53014306/error-15-initializing-
-        # libiomp5-dylib-but-found-libiomp5-dylib-already-initial
-        KMP_DUPLICATE_LIB_OK: true
-    - name: Upload to codecov.io
-      uses: codecov/codecov-action@v1
-      with:
-        file: ./coverage.xml
-        flags: unittests
-        name: codecov-umbrella
-        fail_ci_if_error: true
+  #       # Start postgresql for osx
+  #       rm -rf /usr/local/var/postgresql@10
+  #       initdb /usr/local/var/postgresql@10
+  #       pg_ctl -D /usr/local/var/postgresql@10 start; sleep 5
+  #       createuser -s postgres
+  #   - name: Set up test databases and test data
+  #     run: |
+  #       createdb e2e_test -p 5432 -h 127.0.0.1 -w -U postgres
+  #       createdb inc_test -p 5432 -h 127.0.0.1 -w -U postgres
+  #       createdb meta_test -p 5432 -h 127.0.0.1 -w -U postgres
+  #       createdb pg_test -p 5432 -h 127.0.0.1 -w -U postgres
+  #       cd tests && ./download_data.sh && cd ..
+  #   - name: Print Version Info
+  #     run: |
+  #       pdfinfo -v
+  #       psql --version
+  #       python --version
+  #       pip --version
+  #       neofetch
+  #   - name: Install Fonduer
+  #     run: |
+  #       make dev_extra
+  #       pip install -q pytest-cov
+  #   - name: Run preliminary checks
+  #     run: |
+  #       make check
+  #       make docs
+  #     env:
+  #       PGPASSWORD: postgres
+  #   - name: Test with pytest
+  #     run: |
+  #       python -m spacy download en
+  #       pytest --cov=./ --cov-report=xml
+  #     env:
+  #       PGPASSWORD: postgres
+  #       PGUSER: postgres
+  #       POSTGRES_PORT: 5432
+  #       # Use 127.0.0.1 instead of localhost (#351)
+  #       POSTGRES_HOST: 127.0.0.1
+  #       # https://stackoverflow.com/questions/53014306/error-15-initializing-
+  #       # libiomp5-dylib-but-found-libiomp5-dylib-already-initial
+  #       KMP_DUPLICATE_LIB_OK: true
+  #   - name: Upload to codecov.io
+  #     uses: codecov/codecov-action@v1
+  #     with:
+  #       file: ./coverage.xml
+  #       flags: unittests
+  #       name: codecov-umbrella
+  #       fail_ci_if_error: true
   build-and-publish:
     name: Build and Publish Fonduer to PyPI
     runs-on: ubuntu-latest
