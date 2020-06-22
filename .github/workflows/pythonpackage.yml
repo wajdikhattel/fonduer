@@ -62,10 +62,6 @@ jobs:
       env:
         PGPASSWORD: postgres
     - name: Test with pytest
-      uses: actions/upload-artifact@v1
-      with:
-        name: test
-        path: test.json
       run: |
         pytest tests/e2e/ --cov=./ --cov-report=xml
       env:
