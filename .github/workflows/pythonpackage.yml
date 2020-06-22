@@ -63,9 +63,9 @@ jobs:
         PGPASSWORD: postgres
     - name: Test with pytest
       uses: actions/upload-artifact@v1
-        with:
-          name: test
-          path: test.json
+      with:
+        name: test
+        path: test.json
       run: |
         pytest tests/e2e/ --cov=./ --cov-report=xml
       env:
@@ -168,7 +168,7 @@ jobs:
   build-and-publish:
     name: Build and Publish Fonduer to PyPI
     runs-on: ubuntu-latest
-    needs: [ubuntu-test, macos-test]
+    needs: [ubuntu-test]
     strategy:
       matrix:
         python-version: [3.7]
