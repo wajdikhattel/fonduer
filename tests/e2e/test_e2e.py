@@ -192,7 +192,7 @@ def test_e2e():
     json.dump(x, open('test.json', 'w'))
     assert session.query(Feature).count() == 214
     num_feature_keys = session.query(FeatureKey).count()
-    assert num_feature_keys == 1029
+    assert num_feature_keys == 1281
 
     # Test Dropping FeatureKey
     # Should force a row deletion
@@ -237,7 +237,7 @@ def test_e2e():
     num_features = session.query(Feature).count()
     assert num_features == len(train_cands[0]) + len(train_cands[1])
     num_feature_keys = session.query(FeatureKey).count()
-    assert num_feature_keys == 4613
+    assert num_feature_keys == 4577
     F_train = featurizer.get_feature_matrices(train_cands)
     assert F_train[0].shape == (len(train_cands[0]), num_feature_keys)
     assert F_train[1].shape == (len(train_cands[1]), num_feature_keys)

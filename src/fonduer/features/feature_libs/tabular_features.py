@@ -51,7 +51,7 @@ def extract_tabular_features(
         # Multinary candidates
         else:
             spans = args
-            if all([span.sentence.is_tabular() for span in spans]):
+            if any([span.sentence.is_tabular() for span in spans]):
                 for i, span in enumerate(spans):
                     prefix = f"e{i}_"
                     if span.stable_id not in unary_tablelib_feats:
